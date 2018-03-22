@@ -72,6 +72,7 @@ func Test_Processor(t *testing.T) {
 	fc.data = []byte{}
 
 	telnet := NewTelnet(&fc)
+	telnet.processor.debug = true
 	testStr := "test"
 	readBuffer := make([]byte, 1024)
 
