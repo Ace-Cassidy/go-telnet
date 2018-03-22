@@ -11,45 +11,45 @@ type fakeConn struct {
 	data []byte
 }
 
-func (self *fakeConn) Write(p []byte) (int, error) {
-	self.data = append(self.data, p...)
+func (fc *fakeConn) Write(p []byte) (int, error) {
+	fc.data = append(fc.data, p...)
 	return len(p), nil
 }
 
-func (self *fakeConn) Read(p []byte) (int, error) {
+func (fc *fakeConn) Read(p []byte) (int, error) {
 	n := 0
 
-	for i := 0; i < len(p) && i < len(self.data); i++ {
-		p[i] = self.data[i]
+	for i := 0; i < len(p) && i < len(fc.data); i++ {
+		p[i] = fc.data[i]
 		n++
 	}
 
-	self.data = self.data[n:]
+	fc.data = fc.data[n:]
 
 	return n, nil
 }
 
-func (self *fakeConn) Close() error {
+func (fc *fakeConn) Close() error {
 	return nil
 }
 
-func (self *fakeConn) LocalAddr() net.Addr {
+func (fc *fakeConn) LocalAddr() net.Addr {
 	return nil
 }
 
-func (self *fakeConn) RemoteAddr() net.Addr {
+func (fc *fakeConn) RemoteAddr() net.Addr {
 	return nil
 }
 
-func (self *fakeConn) SetDeadline(t time.Time) error {
+func (fc *fakeConn) SetDeadline(t time.Time) error {
 	return nil
 }
 
-func (self *fakeConn) SetReadDeadline(t time.Time) error {
+func (fc *fakeConn) SetReadDeadline(t time.Time) error {
 	return nil
 }
 
-func (self *fakeConn) SetWriteDeadline(t time.Time) error {
+func (fc *fakeConn) SetWriteDeadline(t time.Time) error {
 	return nil
 }
 

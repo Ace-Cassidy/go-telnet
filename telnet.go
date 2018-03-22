@@ -12,6 +12,7 @@ import (
 var byteToCode map[byte]TelnetCode
 var codeToByte map[TelnetCode]byte
 
+// TelnetCode is a type for the byte values of telnet codes
 type TelnetCode int
 
 func init() {
@@ -104,15 +105,17 @@ func (t *Telnet) Read(p []byte) (int, error) {
 
 }
 
+//Data
 func (t *Telnet) Data(code TelnetCode) []byte {
 	return t.processor.subdata[code]
 }
 
+//Listen
 func (t *Telnet) Listen(listenFunc func(TelnetCode, []byte)) {
 	t.processor.listenFunc = listenFunc
 }
 
-// Idea/name for this function shamelessly stolen from bufio
+//works similiarly to bufio
 func (t *Telnet) fill() {
 	buf := make([]byte, 1024)
 
@@ -121,42 +124,52 @@ func (t *Telnet) fill() {
 	t.processor.addBytes(buf[:n])
 }
 
+//Close implements net.Close
 func (t *Telnet) Close() error {
 	return t.conn.Close()
 }
 
+//LocalAddr implements net.LocalAddr
 func (t *Telnet) LocalAddr() net.Addr {
 	return t.conn.LocalAddr()
 }
 
+//RemoteAddr implements net.RemoteAddr
 func (t *Telnet) RemoteAddr() net.Addr {
 	return t.conn.RemoteAddr()
 }
 
+//SetDeadline implements net.SetDeadLine
 func (t *Telnet) SetDeadline(dl time.Time) error {
 	return t.conn.SetDeadline(dl)
 }
 
+//SetReadDeadline implements net.SetReadDeadLine
 func (t *Telnet) SetReadDeadline(dl time.Time) error {
 	return t.conn.SetReadDeadline(dl)
 }
 
+//SetWriteDeadline implements net.SetWriteDeadLine
 func (t *Telnet) SetWriteDeadline(dl time.Time) error {
 	return t.conn.SetWriteDeadline(dl)
 }
 
+//WillEcho sends request to support echo option
 func (t *Telnet) WillEcho() {
 	t.SendCommand(WILL, ECHO)
 }
 
+//WontEcho sends request to not support echo option
 func (t *Telnet) WontEcho() {
 	t.SendCommand(WONT, ECHO)
 }
 
+//DoWindowSize sends request to support window size option
 func (t *Telnet) DoWindowSize() {
 	t.SendCommand(DO, WS)
 }
 
+//DoTerminalType sends request to support Terminal Type option
 func (t *Telnet) DoTerminalType() {
 	// This is really supposed to be two commands, one to ask if they'll send a
 	// terminal type, and another to indicate that they should send it if
@@ -168,10 +181,12 @@ func (t *Telnet) DoTerminalType() {
 	t.SendCommand(DO, TT, IAC, SB, TT, 1, IAC, SE) // 1 = SEND
 }
 
+//SendCommand writes telnetCodes to net.conn
 func (t *Telnet) SendCommand(codes ...TelnetCode) {
 	t.conn.Write(BuildCommand(codes...))
 }
 
+//BuildCommand constructs properly formatted telnet from raw codes
 func BuildCommand(codes ...TelnetCode) []byte {
 	command := make([]byte, len(codes)+1)
 	command[0] = codeToByte[IAC]
@@ -377,6 +392,7 @@ func (tp *telnetProcessor) subDataFinished(code TelnetCode) {
 	}
 }
 
+//ToString converts multiple telnet byte codes into their names
 func ToString(bytes []byte) string {
 	str := ""
 	for _, b := range bytes {
@@ -391,6 +407,7 @@ func ToString(bytes []byte) string {
 	return str
 }
 
+//ByteToCodeString converts a single telnet byte code into its name
 func ByteToCodeString(b byte) string {
 	code, found := byteToCode[b]
 
@@ -401,6 +418,7 @@ func ByteToCodeString(b byte) string {
 	return CodeToString(code)
 }
 
+//CodeToString converts a TelnetCode type into a string
 func CodeToString(code TelnetCode) string {
 	switch code {
 	case NUL:
